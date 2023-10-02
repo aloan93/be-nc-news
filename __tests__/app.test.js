@@ -43,21 +43,14 @@ describe("GET /api", () => {
   test("should return a 200 status code", () => {
     return request(app).get("/api").expect(200);
   });
-  test("should return an accurate JSON object", () => {
+  test("should return an accurate JSON object that reflects the contents of the endpoints.json file", () => {
     return request(app)
       .get("/api")
       .expect(200)
       .then(({ body }) => {
-        expect(typeof body.endPoints).toBe("string");
-        expect(typeof JSON.parse(body.endPoints)).toBe("object");
-      });
-  });
-  test("should return each endpoint with a key of 'description', as well as 'queries' and 'exampleResponse' when necessary", () => {
-    return request(app)
-      .get("/api")
-      .expect(200)
-      .then(({ body }) => {
-        expect(JSON.parse(body.endPoints)).toEqual(endPointsJson);
+        expect(typeof JSON.stringify(body.endPoints)).toBe("string");
+        expect(typeof body.endPoints).toBe("object");
+        expect(body.endPoints).toEqual(endPointsJson);
       });
   });
 });
