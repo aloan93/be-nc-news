@@ -13,15 +13,18 @@ describe("GET /api/topics", () => {
   test("should return a 200 status code", () => {
     return request(app).get("/api/topics").expect(200);
   });
-  test("should return an array of topics, each with a 'slug' and 'description' property", () => {
+  test("should return an array of all topics, each with a 'slug' and 'description' property", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.topics)).toBe(true);
+        expect(body.topics.length).toBe(3);
         body.topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
+          expect(typeof topic.slug).toBe("string");
+          expect(typeof topic.description).toBe("string");
         });
       });
   });
