@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data");
 const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
+const endPointsJson = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(testData);
@@ -34,6 +35,22 @@ describe("GET /api/topics", () => {
       .expect(404)
       .then(({ res }) => {
         expect(res.statusMessage).toBe("Not Found");
+      });
+  });
+});
+
+describe("GET /api", () => {
+  test("should return a 200 status code", () => {
+    return request(app).get("/api").expect(200);
+  });
+  test("should return an accurate JSON object that reflects the contents of the endpoints.json file", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(typeof JSON.stringify(body.endPoints)).toBe("string");
+        expect(typeof body.endPoints).toBe("object");
+        expect(body.endPoints).toEqual(endPointsJson);
       });
   });
 });
