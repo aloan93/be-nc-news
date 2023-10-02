@@ -1,12 +1,17 @@
 const express = require("express");
 const { getTopics } = require("./controllers/topics.controllers");
 const { getArticleById } = require("./controllers/articles.controllers.js");
+const { getApis } = require("./controllers/apis.controllers");
 
 const app = express();
 
 app.get("/api/topics", getTopics);
 
+app.get("/api", getApis);
+
 app.get("/api/articles/:article_id", getArticleById);
+
+app.get("/api", getApis);
 
 // custom errors
 app.use((err, req, res, next) => {
