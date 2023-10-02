@@ -37,3 +37,9 @@ describe("GET /api/topics", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id", () => {
+  test("should return a 200 status code", () => {
+    return request(app).get("/api/articles/2").expect(200);
+  });
+});
