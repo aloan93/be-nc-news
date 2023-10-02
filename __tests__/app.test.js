@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data");
 const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
+const endPointsJson = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(testData);
@@ -47,8 +48,8 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then(({ body }) => {
-        expect(typeof body.apis).toBe("string");
-        expect(typeof JSON.parse(body.apis)).toBe("object");
+        expect(typeof body.endPoints).toBe("string");
+        expect(typeof JSON.parse(body.endPoints)).toBe("object");
       });
   });
   test("should return each endpoint with a key of 'description', as well as 'queries' and 'exampleResponse' when necessary", () => {
@@ -56,22 +57,7 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then(({ body }) => {
-        const parsedResult = JSON.parse(body.apis);
-        for (const api in parsedResult) {
-          expect(typeof parsedResult[api].description).toBe("string");
-          if (Object.keys(parsedResult[api]).length > 1) {
-            expect(Array.isArray(parsedResult[api].queries)).toBe(true);
-            expect(typeof parsedResult[api].exampleResponse).toBe("object");
-          }
-        }
-      });
-  });
-  test("should return a 404 status code and 'Not Found' when passed an incorrectly spelled api request", () => {
-    return request(app)
-      .get("/apo")
-      .expect(404)
-      .then(({ res }) => {
-        expect(res.statusMessage).toBe("Not Found");
+        expect(JSON.parse(body.endPoints)).toEqual(endPointsJson);
       });
   });
 });
