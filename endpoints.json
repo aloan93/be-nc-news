@@ -25,5 +25,21 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves the selected article as an object",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 2,
+        "votes": 0,
+        "title": "article title",
+        "topic": "good stuff",
+        "author": "Big Geoff",
+        "body": "A day in the life of Geoff...",
+        "created_at": "Wed Nov 01 2000 01:01:00 GMT+0000 (Greenwich Mean Time)",
+        "article_img_url": "*url link to article image*"
+      }
+    }
   }
 }

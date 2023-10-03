@@ -54,3 +54,42 @@ describe("GET /api", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id", () => {
+  test("should return a 200 status code", () => {
+    return request(app).get("/api/articles/2").expect(200);
+  });
+  test("should return the specific article that matches the passed article_id, complete with article_id, votes and a user friendly created_at", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .then(({ body }) => {
+        expect(body.article).toEqual({
+          article_id: 3,
+          votes: 0,
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "some gifs",
+          created_at: "Tue Nov 03 2020 09:12:00 GMT+0000 (Greenwich Mean Time)",
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("should return a 404 status code and 'Article Not Found' when passed an article_id that does not exist", () => {
+    return request(app)
+      .get("/api/articles/99")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article Not Found");
+      });
+  });
+  test("should return a 400 status code and 'Invalid Data Type' when passed an article_id that is not a number", () => {
+    return request(app)
+      .get("/api/articles/six")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+});
