@@ -4,6 +4,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const endPointsJson = require("../endpoints.json");
+require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -94,7 +95,7 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 
-xdescribe("GET /api/articles", () => {
+describe("GET /api/articles", () => {
   test("should return a 200 status code and an array of all article objects", () => {
     return request(app)
       .get("/api/articles")
@@ -105,6 +106,150 @@ xdescribe("GET /api/articles", () => {
         body.articles.forEach((article) => {
           expect(typeof article).toBe("object");
         });
+      });
+  });
+  test("should return each article with keys of author, title, article_id, topic, created_at, votes, article_img_url, and comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+        });
+      });
+  });
+  test("should return each article without a body key", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+        });
+      });
+  });
+  test("should return the articles sorted by date in descending order by default", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("should have the comment_count key reflect how many comments are associated to the article", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].comment_count).toBe("2");
+        expect(body.articles[1].comment_count).toBe("1");
+        expect(body.articles[2].comment_count).toBe("0");
+        expect(body.articles[3].comment_count).toBe("0");
+        expect(body.articles[4].comment_count).toBe("0");
+        expect(body.articles[5].comment_count).toBe("2");
+        expect(body.articles[6].comment_count).toBe("11");
+        expect(body.articles[7].comment_count).toBe("2");
+        expect(body.articles[8].comment_count).toBe("0");
+        expect(body.articles[9].comment_count).toBe("0");
+        expect(body.articles[10].comment_count).toBe("0");
+        expect(body.articles[11].comment_count).toBe("0");
+        expect(body.articles[12].comment_count).toBe("0");
+      });
+  });
+  test('should return a 400 status code and "Invalid Order" when passed an order that is neither "asc" or "desc"', () => {
+    return request(app)
+      .get("/api/articles?order=down")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Order");
+      });
+  });
+  test('should return a 200 status code and "No Matching Articles Found" when passed a valid query that returns no result rows', () => {
+    return request(app)
+      .get("/api/articles?author=videogames")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.message).toBe("No Matching Articles Found");
+      });
+  });
+  test("should return a 200 status code and an array of articles matching a valid query", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([
+          {
+            article_id: 5,
+            author: "rogersop",
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            topic: "cats",
+            created_at: "2020-08-03T13:14:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "2",
+          },
+        ]);
+      });
+  });
+  test("should return a 200 status code and matching articles when provided multiple queries", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&author=butter_bridge")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([
+          {
+            article_id: 12,
+            author: "butter_bridge",
+            title: "Moustache",
+            topic: "mitch",
+            created_at: "2020-10-11T11:24:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "0",
+          },
+          {
+            article_id: 13,
+            author: "butter_bridge",
+            title: "Another article about Mitch",
+            topic: "mitch",
+            created_at: "2020-10-11T11:24:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "0",
+          },
+          {
+            article_id: 1,
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "11",
+          },
+          {
+            article_id: 9,
+            author: "butter_bridge",
+            title: "They're not exactly dogs, are they?",
+            topic: "mitch",
+            created_at: "2020-06-06T09:10:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "2",
+          },
+        ]);
       });
   });
 });
