@@ -233,3 +233,47 @@ describe("GET /api/articles", () => {
   //     });
   // });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("should return a 200 code with an array of all comment objects associated to the article passed, along with all relevent keys", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.comments)).toBe(true);
+        expect(body.comments.length).toBe(11);
+        body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+      });
+  });
+  test("should return the array of comments ordered by post date descending", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("should return a 200 code and 'No comments currently on this article' when passed a an article_id that exists, but has no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.message).toBe("No comments currently on this article");
+      });
+  });
+  test("should return a 404 code and 'Article not found' when passed a an article_id does not exist", () => {
+    return request(app)
+      .get("/api/articles/88/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article not found");
+      });
+  });
+});
