@@ -54,3 +54,18 @@ describe("GET /api", () => {
       });
   });
 });
+
+xdescribe("GET /api/articles", () => {
+  test("should return a 200 status code and an array of all article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(13);
+        body.articles.forEach((article) => {
+          expect(typeof article).toBe("object");
+        });
+      });
+  });
+});
