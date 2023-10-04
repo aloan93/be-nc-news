@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const { commentData } = require("../db/data/test-data");
 const { checkArticleExists } = require("./articles.models");
 const { checkUserExists } = require("./users.models");
 
