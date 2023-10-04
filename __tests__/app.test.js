@@ -249,6 +249,12 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(comment).toHaveProperty("author");
           expect(comment).toHaveProperty("body");
           expect(comment).toHaveProperty("article_id");
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.created_at).toBe("string");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
         });
       });
   });
@@ -260,12 +266,12 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.comments).toBeSortedBy("created_at", { descending: true });
       });
   });
-  test("should return a 200 code and 'No comments currently on this article' when passed a an article_id that exists, but has no comments", () => {
+  test("should return a 200 code and an empty array when passed a an article_id that exists, but has no comments", () => {
     return request(app)
       .get("/api/articles/2/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body.message).toBe("No comments currently on this article");
+        expect(body.comments).toEqual([]);
       });
   });
   test("should return a 404 code and 'Article not found' when passed a an article_id does not exist", () => {
@@ -274,6 +280,14 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("Article not found");
+      });
+  });
+  test("should return a 400 code and 'Invalid Data Type' when passed a an invalid article_id", () => {
+    return request(app)
+      .get("/api/articles/six/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
       });
   });
 });

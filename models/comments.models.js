@@ -8,13 +8,6 @@ exports.fetchCommentsByArticleId = (article_id) => {
     [article_id]
   );
   return Promise.all([doesExist, query]).then((results) => {
-    if (results[1].rows.length === 0) {
-      return Promise.reject({
-        status: 200,
-        message: "No comments currently on this article",
-      });
-    } else {
-      return results[1].rows;
-    }
+    return results[1].rows;
   });
 };
