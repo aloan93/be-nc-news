@@ -292,7 +292,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("should return a 201 status code and the posted comment as an object with all relevant keys", () => {
     const newComment = { username: "rogersop", body: "I like trains" };
     const expectedComment = {
