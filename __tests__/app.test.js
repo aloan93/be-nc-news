@@ -233,3 +233,15 @@ describe("GET /api/articles", () => {
   //     });
   // });
 });
+
+xdescribe("POST /api/articles/:article_id/comments", () => {
+  test("should return a 201 status code and the posted comment as an object", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ username: "Big_Geoff", body: "I like trains" })
+      .expect(201)
+      .then(({ body }) => {
+        expect(typeof body.comment).toBe("object");
+      });
+  });
+});
