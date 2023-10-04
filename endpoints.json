@@ -65,5 +65,19 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a new comment to the select article via article_id and serves the posted comment as an object - takes propertys of 'body' and 'username'",
+    "queries": [],
+    "exampleResponse": {
+      "comments": {
+        "comment_id": 19,
+        "body": "I like trains",
+        "article_id": 2,
+        "author": "rogersop",
+        "votes": 0,
+        "created_at": "2020-11-24T00:08:00.000Z"
+      }
+    }
   }
 }

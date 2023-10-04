@@ -292,14 +292,58 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-xdescribe("POST /api/articles/:article_id/comments", () => {
-  test("should return a 201 status code and the posted comment as an object", () => {
+describe.only("POST /api/articles/:article_id/comments", () => {
+  test("should return a 201 status code and the posted comment as an object with all relevant keys", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+    const expectedComment = {
+      comment_id: 19,
+      body: "I like trains",
+      article_id: 2,
+      author: "rogersop",
+      votes: 0,
+    };
+
     return request(app)
       .post("/api/articles/2/comments")
-      .send({ username: "Big_Geoff", body: "I like trains" })
+      .send(newComment)
       .expect(201)
       .then(({ body }) => {
-        expect(typeof body.comment).toBe("object");
+        expect(body.comment).toMatchObject(expectedComment);
+        expect(typeof body.comment.created_at).toBe("string");
+      });
+  });
+  test("should return a 404 status code and 'User not found' when passed a user not currently in the database", () => {
+    const newComment = { username: "Big_Geoff", body: "aaaaaaaaaa" };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("User not found");
+      });
+  });
+  test("should return a 400 code and 'Invalid Data Type' when passed a an invalid article_id", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+
+    return request(app)
+      .post("/api/articles/six/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+  test("should return a 400 code and 'Missing mandatory property' when failing to supply any required property", () => {
+    const newComment = { username: "rogersop" };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        console.log(body);
+        expect(body.message).toBe("Missing mandatory property");
       });
   });
 });
