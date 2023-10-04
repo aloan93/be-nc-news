@@ -342,7 +342,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        console.log(body);
         expect(body.message).toBe("Missing mandatory property");
       });
   });
