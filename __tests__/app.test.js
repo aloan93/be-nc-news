@@ -291,3 +291,30 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+  test("should return a 200 code with an array of all user objects with 'username', 'name' and 'avatar_url' properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).toBe(4);
+        body.users.forEach((user) => {
+          expect(user).toHaveProperty("username");
+          expect(user).toHaveProperty("name");
+          expect(user).toHaveProperty("avatar_url");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+  test('should return a 404 code and "Not Found" when passed an incorrectly spelled endpoint', () => {
+    return request(app)
+      .get("/api/usres")
+      .expect(404)
+      .then(({ res }) => {
+        expect(res.statusMessage).toBe("Not Found");
+      });
+  });
+});

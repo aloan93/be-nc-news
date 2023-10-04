@@ -65,5 +65,23 @@
         }
       ]
     }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users as objects",
+    "queries": [],
+    "exampleResponse": {
+      "topics": [
+        {
+          "username": "handle",
+          "name": "geoff",
+          "avatar_url": "https://pic.website.com/u/777"
+        },
+        {
+          "username": "sir_small",
+          "name": "billy",
+          "avatar_url": "https://pic.website.com/u/0324"
+        }
+      ]
+    }
   }
 }

@@ -8,6 +8,7 @@ const { getApis } = require("./controllers/apis.controllers");
 const {
   getCommentsByArticleId,
 } = require("./controllers/comments.controllers");
+const { getUsers } = require("./controllers/users.controllers");
 
 const app = express();
 
@@ -20,6 +21,8 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.get("/api", getApis);
+
+app.get("/api/users", getUsers);
 
 // custom errors
 app.use((err, req, res, next) => {
