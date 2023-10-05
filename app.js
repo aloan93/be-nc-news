@@ -11,6 +11,7 @@ const {
   deleteCommentById,
   postCommentToArticleId,
 } = require("./controllers/comments.controllers");
+const { getUsers } = require("./controllers/users.controllers");
 
 const app = express();
 app.use(express.json());
@@ -24,6 +25,8 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.get("/api", getApis);
+
+app.get("/api/users", getUsers);
 
 app.post("/api/articles/:article_id/comments", postCommentToArticleId);
 

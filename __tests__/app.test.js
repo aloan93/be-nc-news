@@ -292,6 +292,22 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("GET /api/users", () => {
+  test("should return a 200 code with an array of all user objects with 'username', 'name' and 'avatar_url' properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).toBe(4);
+        body.users.forEach((user) => {
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
+        });
+      });
+  });
+});
+
 describe("POST /api/articles/:article_id/comments", () => {
   test("should return a 201 status code and the posted comment as an object with all relevant keys", () => {
     const newComment = { username: "rogersop", body: "I like trains" };
