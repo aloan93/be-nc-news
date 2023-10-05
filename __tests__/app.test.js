@@ -449,3 +449,25 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("should return a 204 code with no content when deletion is successful", () => {
+    return request(app).delete("/api/comments/16").expect(204);
+  });
+  test("should return a 404 code with 'Comment not found' when the comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/99")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Comment not found");
+      });
+  });
+  test("should return a 400 code and 'Invalid Data Type' when passed a an invalid comment_id", () => {
+    return request(app)
+      .delete("/api/comments/six")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+});
