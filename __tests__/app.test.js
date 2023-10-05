@@ -305,6 +305,29 @@ describe("GET /api/users", () => {
   });
 });
 
+describe.only("GET /users/:username", () => {
+  test("should return a 200 code and the request user object", () => {
+    return request(app)
+      .get("/api/users/icellusedkars")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.user.username).toBe("icellusedkars");
+        expect(body.user.name).toBe("sam");
+        expect(body.user.avatar_url).toBe(
+          "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        );
+      });
+  });
+  test("should return a 404 code and 'User not found' if passed a username that does not exist", () => {
+    return request(app)
+      .get("/api/users/big_geoff")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("User not found");
+      });
+  });
+});
+
 describe("POST /api/articles/:article_id/comments", () => {
   test("should return a 201 status code and the posted comment as an object with all relevant keys", () => {
     const newComment = { username: "rogersop", body: "I like trains" };

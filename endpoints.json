@@ -85,6 +85,17 @@
       ]
     }
   },
+  "GET /api/users/:username": {
+    "description": "serves a user object via 'username' with 'username', 'name' and 'avatar_url' properties",
+    "queries": [],
+    "exampleResponse": {
+      "topics": {
+        "username": "big_geoff",
+        "name": "geoff",
+        "avatar_url": "https://pic.website.com/u/777"
+      }
+    }
+  },
   "POST /api/articles/:article_id/comments": {
     "description": "posts a new comment to the select article via article_id and serves the posted comment as an object - takes propertys of 'body' and 'username'",
     "queries": [],
