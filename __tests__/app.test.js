@@ -60,21 +60,29 @@ describe("GET /api/articles/:article_id", () => {
   test("should return a 200 status code", () => {
     return request(app).get("/api/articles/2").expect(200);
   });
-  test("should return the specific article that matches the passed article_id, complete with article_id, votes and a user friendly created_at", () => {
+  test("should return the specific article that matches the passed article_id, complete with article_id, votes and created_at properties", () => {
     return request(app)
       .get("/api/articles/3")
       .then(({ body }) => {
-        expect(body.article).toEqual({
+        expect(body.article).toMatchObject({
           article_id: 3,
           votes: 0,
           title: "Eight pug gifs that remind me of mitch",
           topic: "mitch",
           author: "icellusedkars",
           body: "some gifs",
-          created_at: "Tue Nov 03 2020 09:12:00 GMT+0000 (Greenwich Mean Time)",
+          created_at: "2020-11-03T09:12:00.000Z",
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         });
+      });
+  });
+  test("should return the article with the property of comment_count that represents the total comments associated to the article", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.comment_count).toBe("2");
       });
   });
   test("should return a 404 status code and 'Article Not Found' when passed an article_id that does not exist", () => {
