@@ -143,95 +143,84 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSortedBy("created_at", { descending: true });
       });
   });
-  // test('should return a 400 status code and "Invalid Order" when passed an order that is neither "asc" or "desc"', () => {
-  //   return request(app)
-  //     .get("/api/articles?order=down")
-  //     .expect(400)
-  //     .then(({ body }) => {
-  //       expect(body.message).toBe("Invalid Order");
-  //     });
-  // });
-  // test('should return a 200 status code and "No Matching Articles Found" when passed a valid query that returns no result rows', () => {
-  //   return request(app)
-  //     .get("/api/articles?author=videogames")
-  //     .expect(200)
-  //     .then(({ body }) => {
-  //       expect(body.message).toBe("No Matching Articles Found");
-  //     });
-  // });
-  // test("should return a 200 status code and an array of articles matching a valid query", () => {
-  //   return request(app)
-  //     .get("/api/articles?topic=cats")
-  //     .expect(200)
-  //     .then(({ body }) => {
-  //       expect(body.articles).toEqual([
-  //         {
-  //           article_id: 5,
-  //           author: "rogersop",
-  //           title: "UNCOVERED: catspiracy to bring down democracy",
-  //           topic: "cats",
-  //           created_at: "2020-08-03T13:14:00.000Z",
-  //           votes: 0,
-  //           article_img_url:
-  //             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-  //           comment_count: "2",
-  //         },
-  //       ]);
-  //     });
-  // });
-  // test("should return a 200 status code and matching articles when provided multiple queries", () => {
-  //   return request(app)
-  //     .get("/api/articles?topic=mitch&author=butter_bridge")
-  //     .expect(200)
-  //     .then(({ body }) => {
-  //       expect(body.articles).toEqual([
-  //         {
-  //           article_id: 12,
-  //           author: "butter_bridge",
-  //           title: "Moustache",
-  //           topic: "mitch",
-  //           created_at: "2020-10-11T11:24:00.000Z",
-  //           votes: 0,
-  //           article_img_url:
-  //             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-  //           comment_count: "0",
-  //         },
-  //         {
-  //           article_id: 13,
-  //           author: "butter_bridge",
-  //           title: "Another article about Mitch",
-  //           topic: "mitch",
-  //           created_at: "2020-10-11T11:24:00.000Z",
-  //           votes: 0,
-  //           article_img_url:
-  //             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-  //           comment_count: "0",
-  //         },
-  //         {
-  //           article_id: 1,
-  //           author: "butter_bridge",
-  //           title: "Living in the shadow of a great man",
-  //           topic: "mitch",
-  //           created_at: "2020-07-09T20:11:00.000Z",
-  //           votes: 100,
-  //           article_img_url:
-  //             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-  //           comment_count: "11",
-  //         },
-  //         {
-  //           article_id: 9,
-  //           author: "butter_bridge",
-  //           title: "They're not exactly dogs, are they?",
-  //           topic: "mitch",
-  //           created_at: "2020-06-06T09:10:00.000Z",
-  //           votes: 0,
-  //           article_img_url:
-  //             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-  //           comment_count: "2",
-  //         },
-  //       ]);
-  //     });
-  // });
+  test("should return the articles sorted by any valid property when supplied as a query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("title", {
+          descending: true,
+        });
+      });
+  });
+  test("should return the articles sorted in ascending order if specified", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("title", {
+          descending: false,
+        });
+      });
+  });
+  test("should return all articles of a specific topic when queried", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("should return all articles of a specific author when queried", () => {
+    return request(app)
+      .get("/api/articles?author=rogersop")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+        body.articles.forEach((article) => {
+          expect(article.author).toBe("rogersop");
+        });
+      });
+  });
+  test('should return a 200 status code and "No Matching Articles Found" when passed a valid query that returns no result rows', () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.message).toBe("No Matching Articles Found");
+      });
+  });
+  test("should return all matching articles when provided multiple queries", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&author=butter_bridge")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toEqual(4);
+        body.articles.forEach((article) => {
+          expect(article.author).toBe("butter_bridge");
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("should return a 400 status code when passed an invalid sort_by", () => {
+    return request(app)
+      .get("/api/articles?sort_by=username")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid sort_by");
+      });
+  });
+  test('should return a 400 status code and "Invalid Order" when passed an order that is neither "asc" or "desc"', () => {
+    return request(app)
+      .get("/api/articles?order=down")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Order");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
