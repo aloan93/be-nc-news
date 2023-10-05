@@ -7,17 +7,20 @@ For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/
 1. .env.test -> into this add PGDATABASE=nc_news_test
 2. .env.development -> into this add PGDATABASE=nc_news
 
-NC(Northcoders) News
 A RESTful backend API allowing interaction with a database of news articles, topics, comments and users.
 
 hosted here --> https://northcoders-news-3948.onrender.com
 
-Getting Started
+## Getting Started
+
 Before installing you will need to have Node.js and NPM installed on your machine. Instructions for doing this can be found at:
 Node.js --> https://nodejs.org/en/download
 NPM --> https://docs.npmjs.com/getting-started
 
-Step 1: Cloning
+### Step 1: Cloning
+
 Clone this repository to your machine and navigate to the root directory with the following terminal commends:
 git clone https://github.com/aloan93/be-nc-news.git
 cd be-nc-news
+
+### Step 2: Installing Dependencies
