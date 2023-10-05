@@ -305,7 +305,7 @@ describe("GET /api/users", () => {
   });
 });
 
-describe.only("GET /users/:username", () => {
+describe("GET /users/:username", () => {
   test("should return a 200 code and the request user object", () => {
     return request(app)
       .get("/api/users/icellusedkars")
