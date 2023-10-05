@@ -155,7 +155,7 @@ describe("GET /api/articles", () => {
   });
   test("should return the articles sorted in ascending order if specified", () => {
     return request(app)
-      .get("/api/articles?sort_by=title&order=ASC")
+      .get("/api/articles?sort_by=title&order=asc")
       .expect(200)
       .then(({ body }) => {
         expect(body.articles).toBeSortedBy("title", {

@@ -52,7 +52,7 @@ exports.fetchArticles = (
 
   query += ` ORDER BY ${validSortBys[sort_by]} ${order}`;
 
-  if (order === "DESC" || order === "ASC") {
+  if (order.toUpperCase() === "DESC" || order.toUpperCase() === "ASC") {
     return db.query(query, queryParams).then((result) => {
       if (result.rows.length === 0) {
         return Promise.reject({
