@@ -187,7 +187,7 @@ describe("GET /api/articles", () => {
   });
   test('should return a 200 status code and "No Matching Articles Found" when passed a valid query that returns no result rows', () => {
     return request(app)
-      .get("/api/articles?topic=videogames")
+      .get("/api/articles?topic=paper")
       .expect(200)
       .then(({ body }) => {
         expect(body.message).toBe("No Matching Articles Found");
