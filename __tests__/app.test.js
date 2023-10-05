@@ -345,4 +345,26 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(body.message).toBe("Missing mandatory property");
       });
   });
+  test("should return a 404 code and 'Not Found' when failing to pass an article_id", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+
+    return request(app)
+      .post("/api/articles/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ res }) => {
+        expect(res.statusMessage).toBe("Not Found");
+      });
+  });
+  test("should return a 404 code and 'Article not found' when passing a valid article_id that does not exist", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+
+    return request(app)
+      .post("/api/articles/99/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article not found");
+      });
+  });
 });

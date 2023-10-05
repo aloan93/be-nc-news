@@ -20,12 +20,15 @@ exports.addCommentToArticleId = (article_id, username, body) => {
       message: "Missing mandatory property",
     });
   }
+  const doesArticleExist = checkArticleExists(article_id);
   const doesUserExist = checkUserExists(username);
   const query = db.query(
     `INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *;`,
     [body, article_id, username]
   );
-  return Promise.all([doesUserExist, query]).then((results) => {
-    return results[1].rows[0];
-  });
+  return Promise.all([doesUserExist, query, doesArticleExist]).then(
+    (results) => {
+      return results[1].rows[0];
+    }
+  );
 };
