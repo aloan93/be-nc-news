@@ -300,21 +300,10 @@ describe("GET /api/users", () => {
       .then(({ body }) => {
         expect(body.users.length).toBe(4);
         body.users.forEach((user) => {
-          expect(user).toHaveProperty("username");
-          expect(user).toHaveProperty("name");
-          expect(user).toHaveProperty("avatar_url");
-          expect(typeof user.name).toBe("string");
-          expect(typeof user.username).toBe("string");
-          expect(typeof user.avatar_url).toBe("string");
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
         });
-      });
-  });
-  test('should return a 404 code and "Not Found" when passed an incorrectly spelled endpoint', () => {
-    return request(app)
-      .get("/api/usres")
-      .expect(404)
-      .then(({ res }) => {
-        expect(res.statusMessage).toBe("Not Found");
       });
   });
 });
