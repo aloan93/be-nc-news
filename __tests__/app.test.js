@@ -292,6 +292,101 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("POST /api/articles/:article_id/comments", () => {
+  test("should return a 201 status code and the posted comment as an object with all relevant keys", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+    const expectedComment = {
+      comment_id: 19,
+      body: "I like trains",
+      article_id: 2,
+      author: "rogersop",
+      votes: 0,
+    };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toMatchObject(expectedComment);
+        expect(typeof body.comment.created_at).toBe("string");
+      });
+  });
+  test("should return a 404 status code and 'User not found' when passed a user not currently in the database", () => {
+    const newComment = { username: "Big_Geoff", body: "aaaaaaaaaa" };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("User not found");
+      });
+  });
+  test("should return a 400 code and 'Invalid Data Type' when passed a an invalid article_id", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+
+    return request(app)
+      .post("/api/articles/six/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+  test("should return a 400 code and 'Missing mandatory property' when failing to supply any required property", () => {
+    const newComment = { username: "rogersop" };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Missing mandatory property");
+      });
+  });
+  test("should return a 404 code and 'Not Found' when failing to pass an article_id", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+
+    return request(app)
+      .post("/api/articles/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ res }) => {
+        expect(res.statusMessage).toBe("Not Found");
+      });
+  });
+  test("should return a 404 code and 'Article not found' when passing a valid article_id that does not exist", () => {
+    const newComment = { username: "rogersop", body: "I like trains" };
+
+    return request(app)
+      .post("/api/articles/99/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article not found");
+      });
+  });
+  test("should return a 400 code when passed an invalid article_id", () => {
+    return request(app)
+      .patch("/api/articles/six")
+      .send({ inc_votes: -50 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+  test("should return a 400 code when passed an invalid inc_votes value", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "five" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+});
+
 describe("PATCH /api/articles/:article_id", () => {
   test('should return a 201 code and an article object with the "votes" property incremented by the "inc_votes" passed', () => {
     const expectedObj = {
@@ -336,24 +431,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("Article not found");
-      });
-  });
-  test("should return a 400 code when passed an invalid article_id", () => {
-    return request(app)
-      .patch("/api/articles/six")
-      .send({ inc_votes: -50 })
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe("Invalid Data Type");
-      });
-  });
-  test("should return a 400 code when passed an invalid inc_votes value", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: "five" })
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe("Invalid Data Type");
       });
   });
 });
