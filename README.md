@@ -34,3 +34,8 @@ Before creating and seeding the databases you will need to create two .env files
 touch .env.development
 touch .env.test
 Into .env.development insert PGDATABASE=nc_news and into .env.test insert PGDATABASE=nc_news_test
+
+Now you will be able to create and seed the databases, and for this purpose I have created some scripts to make the process easier.
+
+First run the setup-dbs script to create the databases by using the following terminal command:
+npm run setup-dbs
