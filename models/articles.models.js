@@ -8,7 +8,7 @@ exports.fetchArticleById = (article_id) => {
       [article_id]
     )
     .then(({ rows }) => {
-      if (rows < 1) {
+      if (rows.length === 0) {
         return Promise.reject({ status: 404, message: "Article Not Found" });
       } else {
         return rows[0];

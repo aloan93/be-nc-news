@@ -4,7 +4,6 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const endPointsJson = require("../endpoints.json");
-const { expect } = require("@jest/globals");
 require("jest-sorted");
 
 beforeEach(() => {
