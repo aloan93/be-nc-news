@@ -3,11 +3,13 @@ const { getTopics } = require("./controllers/topics.controllers");
 const {
   getArticleById,
   getArticles,
+  patchArticleById,
 } = require("./controllers/articles.controllers.js");
 const { getApis } = require("./controllers/apis.controllers");
 const {
   getCommentsByArticleId,
   deleteCommentById,
+  postCommentToArticleId,
 } = require("./controllers/comments.controllers");
 
 const app = express();
@@ -22,6 +24,10 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.get("/api", getApis);
+
+app.post("/api/articles/:article_id/comments", postCommentToArticleId);
+
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
