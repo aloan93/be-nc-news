@@ -388,7 +388,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-  test('should return a 201 code and an article object with the "votes" property incremented by the "inc_votes" passed', () => {
+  test('should return a 200 code and an article object with the "votes" property incremented by the "inc_votes" passed', () => {
     const expectedObj = {
       article_id: 3,
       title: "Eight pug gifs that remind me of mitch",
@@ -403,7 +403,7 @@ describe("PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/3")
       .send({ inc_votes: 5 })
-      .expect(201)
+      .expect(200)
       .then(({ body }) => {
         expect(body.article).toMatchObject(expectedObj);
         expect(typeof body.article.created_at).toBe("string");
@@ -419,7 +419,22 @@ describe("PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: -50 })
-      .expect(201)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject(expectedObj);
+      });
+  });
+  test("should return a 200 code and unchanged article if passed an empty patch body", () => {
+    const expectedObj = {
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      votes: 100,
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(200)
       .then(({ body }) => {
         expect(body.article).toMatchObject(expectedObj);
       });
