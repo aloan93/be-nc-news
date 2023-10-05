@@ -367,4 +367,85 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(body.message).toBe("Article not found");
       });
   });
+  test("should return a 400 code when passed an invalid article_id", () => {
+    return request(app)
+      .patch("/api/articles/six")
+      .send({ inc_votes: -50 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+  test("should return a 400 code when passed an invalid inc_votes value", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "five" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test('should return a 200 code and an article object with the "votes" property incremented by the "inc_votes" passed', () => {
+    const expectedObj = {
+      article_id: 3,
+      title: "Eight pug gifs that remind me of mitch",
+      topic: "mitch",
+      author: "icellusedkars",
+      body: "some gifs",
+      votes: 5,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .patch("/api/articles/3")
+      .send({ inc_votes: 5 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject(expectedObj);
+        expect(typeof body.article.created_at).toBe("string");
+      });
+  });
+  test('should also decrement the "votes" property when passed a negative "inc_votes" value', () => {
+    const expectedObj = {
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      votes: 50,
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -50 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject(expectedObj);
+      });
+  });
+  test("should return a 200 code and unchanged article if passed an empty patch body", () => {
+    const expectedObj = {
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      votes: 100,
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject(expectedObj);
+      });
+  });
+  test("should return a 404 code when passed an article_id that does not exist", () => {
+    return request(app)
+      .patch("/api/articles/99")
+      .send({ inc_votes: -50 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article not found");
+      });
+  });
 });

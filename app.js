@@ -3,6 +3,7 @@ const { getTopics } = require("./controllers/topics.controllers");
 const {
   getArticleById,
   getArticles,
+  patchArticleById,
 } = require("./controllers/articles.controllers.js");
 const { getApis } = require("./controllers/apis.controllers");
 const {
@@ -24,6 +25,8 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.get("/api", getApis);
 
 app.post("/api/articles/:article_id/comments", postCommentToArticleId);
+
+app.patch("/api/articles/:article_id", patchArticleById);
 
 // custom errors
 app.use((err, req, res, next) => {
