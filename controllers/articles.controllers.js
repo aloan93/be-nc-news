@@ -17,10 +17,10 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { author, topic, sort_by, order } = req.query;
-  return fetchArticles(author, topic, sort_by, order)
-    .then((articles) => {
-      res.status(200).send({ articles });
+  const { author, topic, sort_by, order, limit, p } = req.query;
+  return fetchArticles(author, topic, sort_by, order, limit, p)
+    .then((results) => {
+      res.status(200).send({ total_count: results[0], articles: results[1] });
     })
     .catch((err) => {
       next(err);
