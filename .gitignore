@@ -1,3 +1,4 @@
 node_modules
-.env.*
+.env*
 playground*
+error-handling.md
