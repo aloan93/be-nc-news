@@ -1,4 +1,6 @@
 const db = require("../db/connection");
+const { checkUserExists } = require("./users.models");
+const { checkTopicExists } = require("./topics.models");
 
 exports.fetchArticleById = (article_id) => {
   return db
@@ -91,4 +93,37 @@ exports.updateArticleById = (article_id, inc_votes = 0) => {
       }
       return rows[0];
     });
+};
+
+exports.createArticle = (
+  author,
+  title,
+  body,
+  topic,
+  article_img_url = "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+) => {
+  if (!author || !title || !body || !topic) {
+    return Promise.reject({
+      status: 400,
+      message: "Missing mandatory property",
+    });
+  }
+  const doesUserExist = checkUserExists(author);
+  const doesTopicExist = checkTopicExists(topic);
+  const query = db
+    .query(
+      `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
+      [author, title, body, topic, article_img_url]
+    )
+    .then(({ rows }) => {
+      const { article_id } = rows[0];
+      return db.query(
+        `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.body, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count 
+      FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id;`,
+        [article_id]
+      );
+    });
+  return Promise.all([doesUserExist, query, doesTopicExist]).then((results) => {
+    return results[1].rows[0];
+  });
 };

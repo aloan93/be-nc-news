@@ -110,6 +110,22 @@
       }
     }
   },
+  "POST /api/articles/": {
+    "description": "posts a new article and serves the posted article as an object - takes propertys of 'author', 'title', 'body' and 'topic' as mandatory, and 'article_image_url' as optional and will be defaulted if not supplied",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "author": "rogersop",
+        "title": "Ode to Books",
+        "body": "They're pretty canny like",
+        "topic": "paper",
+        "article_img_url": "smashing_pic.com/234",
+        "article_id": 14,
+        "votes": 0,
+        "comment_count": "0"
+      }
+    }
+  },
   "PATCH /api/articles/:article_id": {
     "description": "updates the selcted article via article_id - adjusts the votes property by the value provided on 'inc_votes' - serves the updated article as an object",
     "queries": [],
