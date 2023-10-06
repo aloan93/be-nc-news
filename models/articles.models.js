@@ -22,7 +22,9 @@ exports.fetchArticles = (
   author,
   topic,
   sort_by = "created_at",
-  order = "DESC"
+  order = "DESC",
+  limit = 10,
+  p = 1
 ) => {
   const validSortBys = {
     article_id: "article_id",
@@ -34,6 +36,24 @@ exports.fetchArticles = (
 
   if (!validSortBys[sort_by]) {
     return Promise.reject({ status: 400, message: "Invalid sort_by" });
+  }
+
+  if (order.toUpperCase() !== "DESC" && order.toUpperCase() !== "ASC") {
+    return Promise.reject({ status: 400, message: "Invalid Order" });
+  }
+
+  if (
+    !Number(limit) ||
+    !Number(p) ||
+    p % 1 !== 0 ||
+    limit % 1 !== 0 ||
+    p < 1 ||
+    limit < 1
+  ) {
+    return Promise.reject({
+      status: 400,
+      message: "Invalid limit/page query",
+    });
   }
 
   let query = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count 
@@ -56,19 +76,25 @@ exports.fetchArticles = (
 
   query += ` ORDER BY ${validSortBys[sort_by]} ${order}`;
 
-  if (order.toUpperCase() === "DESC" || order.toUpperCase() === "ASC") {
-    return db.query(query, queryParams).then((result) => {
-      if (result.rows.length === 0) {
-        return Promise.reject({
-          status: 200,
-          message: "No Matching Articles Found",
-        });
-      }
-      return result.rows;
-    });
-  } else {
-    return Promise.reject({ status: 400, message: "Invalid Order" });
-  }
+  const total_count = db.query(query, queryParams).then(({ rows }) => {
+    return rows.length;
+  });
+
+  query += ` LIMIT ${limit} OFFSET ${(p - 1) * limit}`;
+
+  const finalQuery = db.query(query, queryParams).then(({ rows }) => {
+    return rows;
+  });
+
+  return Promise.all([total_count, finalQuery]).then((results) => {
+    if (results[0] === 0) {
+      return Promise.reject({
+        status: 200,
+        message: "No Matching Articles Found",
+      });
+    }
+    return results;
+  });
 };
 
 exports.checkArticleExists = (article_id) => {

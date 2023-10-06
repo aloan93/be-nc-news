@@ -104,13 +104,13 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("should return a 200 status code and an array of all article objects", () => {
+  test("should return a 200 status code and an array of article objects and a 'total_count' equal to all articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
-        expect(body.articles.length).toBe(13);
+        expect(body.total_count).toBe(13);
         body.articles.forEach((article) => {
           expect(typeof article).toBe("object");
         });
@@ -176,7 +176,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles?topic=mitch")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(12);
+        expect(body.total_count).toBe(12);
         body.articles.forEach((article) => {
           expect(article.topic).toBe("mitch");
         });
@@ -227,6 +227,112 @@ describe("GET /api/articles", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Invalid Order");
+      });
+  });
+  test('should accept a "limit" query which limits the number of responses returned', () => {
+    return request(app)
+      .get("/api/articles?limit=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+      });
+  });
+  test('should default "limit" to 10 if not passed as a query', () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(10);
+      });
+  });
+  test('should accept a "p" query which indicates which page of results to retrieve', () => {
+    return request(app)
+      .get("/api/articles?limit=3&p=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+        expect(body.articles).toEqual([
+          {
+            article_id: 1,
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "11",
+          },
+          {
+            article_id: 9,
+            author: "butter_bridge",
+            title: "They're not exactly dogs, are they?",
+            topic: "mitch",
+            created_at: "2020-06-06T09:10:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "2",
+          },
+          {
+            article_id: 10,
+            author: "rogersop",
+            title: "Seven inspirational thought leaders from Manchester UK",
+            topic: "mitch",
+            created_at: "2020-05-14T04:15:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "0",
+          },
+        ]);
+      });
+  });
+  test('should default "p" to 1 if not passed as a query so to display first page', () => {
+    return request(app)
+      .get("/api/articles?limit=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([
+          {
+            article_id: 3,
+            author: "icellusedkars",
+            title: "Eight pug gifs that remind me of mitch",
+            topic: "mitch",
+            created_at: "2020-11-03T09:12:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "2",
+          },
+          {
+            article_id: 6,
+            author: "icellusedkars",
+            title: "A",
+            topic: "mitch",
+            created_at: "2020-10-18T01:00:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "1",
+          },
+        ]);
+      });
+  });
+  test("should return a 400 code and 'Invalid limit/page data type' if passed a non-number for 'limit' or 'p'", () => {
+    return request(app)
+      .get("/api/articles?limit=2&p=three")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid limit/page query");
+      });
+  });
+  test("should also return a 400 code and 'Invalid limit/page query' if 'limit' or 'p' is passed as a float, zero, or negative number", () => {
+    return request(app)
+      .get("/api/articles?limit=0")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toEqual("Invalid limit/page query");
       });
   });
 });
