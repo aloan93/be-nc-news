@@ -486,6 +486,54 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("PATCH /api/comments/:comment_id", () => {
+  test('should return a 200 code and a comment object with the "votes" property incremented by the "inc_votes" passed', () => {
+    const expectedObj = {
+      comment_id: 2,
+      body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+      article_id: 1,
+      author: "butter_bridge",
+      votes: 20,
+    };
+
+    return request(app)
+      .patch("/api/comments/2")
+      .send({ inc_votes: 6 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment).toMatchObject(expectedObj);
+        expect(typeof body.comment.created_at).toBe("string");
+      });
+  });
+  test('should also decrement the "votes" property when passed a negative "inc_votes" value', () => {
+    return request(app)
+      .patch("/api/comments/2")
+      .send({ inc_votes: -4 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment.votes).toBe(10);
+      });
+  });
+  test("should return a 200 code and unchanged comment if passed an empty patch body", () => {
+    return request(app)
+      .patch("/api/comments/2")
+      .send({})
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment.votes).toBe(14);
+      });
+  });
+  test("should return a 404 code when passed a comment_id that does not exist", () => {
+    return request(app)
+      .patch("/api/comments/50")
+      .send({ inc_votes: -10 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Comment not found");
+      });
+  });
+});
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("should return a 204 code with no content when deletion is successful", () => {
     return request(app).delete("/api/comments/16").expect(204);
