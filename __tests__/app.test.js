@@ -337,10 +337,10 @@ describe("GET /api/articles", () => {
   });
 });
 
-describe("GET /api/articles/:article_id/comments", () => {
+describe.only("GET /api/articles/:article_id/comments", () => {
   test("should return a 200 code with an array of all comment objects associated to the article passed, along with all relevent keys", () => {
     return request(app)
-      .get("/api/articles/1/comments")
+      .get("/api/articles/1/comments?limit=15")
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.comments)).toBe(true);
@@ -391,6 +391,48 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+  test("should accept a 'limit' query that limits the amount of responses returned", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(2);
+      });
+  });
+  test("should default 'limit' to 10 if not passed as a query", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(10);
+      });
+  });
+  test("should accept a 'p' query which indicates which page of results to retrieve", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=2&p=2")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body.comments);
+        expect(body.comments).toEqual([
+          {
+            comment_id: 18,
+            body: "This morning, I showered for nine minutes.",
+            article_id: 1,
+            author: "butter_bridge",
+            votes: 16,
+            created_at: "2020-07-21T00:20:00.000Z",
+          },
+          {
+            comment_id: 13,
+            body: "Fruit pastilles",
+            article_id: 1,
+            author: "icellusedkars",
+            votes: 0,
+            created_at: "2020-06-15T10:25:00.000Z",
+          },
+        ]);
       });
   });
 });

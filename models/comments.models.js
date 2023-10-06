@@ -2,11 +2,13 @@ const db = require("../db/connection");
 const { checkArticleExists } = require("./articles.models");
 const { checkUserExists } = require("./users.models");
 
-exports.fetchCommentsByArticleId = (article_id) => {
+exports.fetchCommentsByArticleId = (article_id, limit = 10, p = 1) => {
   const doesExist = checkArticleExists(article_id);
   const query = db.query(
-    `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
-    [article_id]
+    `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET ${
+      (p - 1) * limit
+    };`,
+    [article_id, limit]
   );
   return Promise.all([doesExist, query]).then((results) => {
     return results[1].rows;
