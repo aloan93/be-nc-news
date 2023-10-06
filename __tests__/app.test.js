@@ -403,22 +403,103 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(body.message).toBe("Article not found");
       });
   });
-  test("should return a 400 code when passed an invalid article_id", () => {
+});
+
+describe("POST /api/articles", () => {
+  test("should return a 201 status code and the posted comment as an object with all relevant keys", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: "Ode to Books",
+      body: "They're pretty canny like",
+      topic: "paper",
+      article_img_url: "smashing_pic",
+    };
+    const expectedArticle = {
+      author: "rogersop",
+      title: "Ode to Books",
+      body: "They're pretty canny like",
+      topic: "paper",
+      article_img_url: "smashing_pic",
+      article_id: 14,
+      votes: 0,
+      comment_count: "0",
+    };
+
     return request(app)
-      .patch("/api/articles/six")
-      .send({ inc_votes: -50 })
-      .expect(400)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
       .then(({ body }) => {
-        expect(body.message).toBe("Invalid Data Type");
+        expect(body.article).toMatchObject(expectedArticle);
+        expect(typeof body.article.created_at).toBe("string");
       });
   });
-  test("should return a 400 code when passed an invalid inc_votes value", () => {
+  test("should return a 404 status code and 'User not found' when passed an 'author' who's not a user in the database", () => {
+    const newArticle = {
+      author: "big_geoff",
+      title: "Ode to Books",
+      body: "They're pretty canny like",
+      topic: "paper",
+      article_img_url: "smashing_pic",
+    };
+
     return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: "five" })
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("User not found");
+      });
+  });
+  test("should return a 404 code and 'Topic not found' when passed an invalid 'topic'", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: "Ode to Books",
+      body: "They're pretty canny like",
+      topic: "books",
+      article_img_url: "smashing_pic",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Topic not found");
+      });
+  });
+  test("should return a 400 code and 'Missing mandatory property' when failing to supply any required property", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: "Ode to Books",
+      body: "They're pretty canny like",
+      article_img_url: "smashing_pic",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe("Invalid Data Type");
+        expect(body.message).toBe("Missing mandatory property");
+      });
+  });
+  test("should return a 201 code and article object with defaulted 'article_img_url' when not passed in the post request", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: "Ode to Books",
+      body: "They're pretty canny like",
+      topic: "paper",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article.article_img_url).toBe(
+          "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+        );
       });
   });
 });
@@ -482,6 +563,24 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("Article not found");
+      });
+  });
+  test("should return a 400 code when passed an invalid article_id", () => {
+    return request(app)
+      .patch("/api/articles/six")
+      .send({ inc_votes: -50 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
+      });
+  });
+  test("should return a 400 code when passed an invalid inc_votes value", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "five" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid Data Type");
       });
   });
 });
