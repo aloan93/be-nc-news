@@ -337,7 +337,7 @@ describe("GET /api/articles", () => {
   });
 });
 
-describe.only("GET /api/articles/:article_id/comments", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   test("should return a 200 code with an array of all comment objects associated to the article passed, along with all relevent keys", () => {
     return request(app)
       .get("/api/articles/1/comments?limit=15")
@@ -414,7 +414,6 @@ describe.only("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments?limit=2&p=2")
       .expect(200)
       .then(({ body }) => {
-        console.log(body.comments);
         expect(body.comments).toEqual([
           {
             comment_id: 18,
